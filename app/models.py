@@ -1,9 +1,12 @@
-from sqlalchemy import Column, DateTime, Integer, String, Numeric, ForeignKey, Date
+from sqlalchemy import (Column, Date, DateTime, ForeignKey, Integer, Numeric,
+                        String)
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
-from app.db.config import MAX_APARTMENT_ADDRESS_LEN, MAX_RENTER_FIRSTNAME_LEN, MAX_RENTER_LASTNAME_LEN
 
-    
+from app.db.base_class import Base
+from app.db.config import (MAX_APARTMENT_ADDRESS_LEN, MAX_RENTER_FIRSTNAME_LEN,
+                           MAX_RENTER_LASTNAME_LEN)
+
+
 class Apartments(Base):
     apartment_id = Column(Integer, primary_key=True)
     address = Column(String(MAX_APARTMENT_ADDRESS_LEN))
