@@ -1,20 +1,23 @@
 from datetime import datetime
 
 import pytest
-from fastapi.encoders import jsonable_encoder
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from app.db.db import db_get_apartments
+from app.db.db import db_create_obj, db_get_apartments
+from app.models import Apartments as ModelApartments
 from app.models import Base
-from main import app, db_create_apartment, db_create_lease, db_create_renter
+from app.models import Leases as ModelLeases
+from app.models import Renters as ModelRenters
+from main import app
 
 client = TestClient(app)
 
 
 # Unittests exclusively for the db operations
 # tests for the routes come later in a separate file
+
 
 @pytest.fixture
 def test_db():
@@ -26,31 +29,37 @@ def test_db():
     yield SessionLocal
     Base.metadata.drop_all(bind=engine)
 
+
 test_cases = [
-    {"apartments": [],  "vacant_filter": False, "expected_len": 0, "expected_addresses": []},
+    {
+        "apartments": [],
+        "vacant_filter": False,
+        "expected_len": 0,
+        "expected_addresses": [],
+    },
     {
         "apartments": [{"address": "example1", "vacant": True}],
         "vacant_filter": False,
         "expected_len": 1,
-        "expected_addresses": ["example1"]
+        "expected_addresses": ["example1"],
     },
     {
         "apartments": [{"address": "example2", "vacant": True}],
         "vacant_filter": True,
         "expected_len": 1,
-        "expected_addresses": ["example2"]
+        "expected_addresses": ["example2"],
     },
     {
         "apartments": [{"address": "example3", "vacant": False}],
         "vacant_filter": False,
         "expected_len": 1,
-        "expected_addresses": ["example3"]
+        "expected_addresses": ["example3"],
     },
     {
         "apartments": [{"address": "example4", "vacant": False}],
         "vacant_filter": True,
         "expected_len": 0,
-        "expected_addresses": []
+        "expected_addresses": [],
     },
     {
         "apartments": [
@@ -59,7 +68,7 @@ test_cases = [
         ],
         "vacant_filter": False,
         "expected_len": 2,
-        "expected_addresses": ["example5_1", "example5_2"]
+        "expected_addresses": ["example5_1", "example5_2"],
     },
     {
         "apartments": [
@@ -68,7 +77,7 @@ test_cases = [
         ],
         "vacant_filter": True,
         "expected_len": 2,
-        "expected_addresses": ["example6_1", "example6_2"]
+        "expected_addresses": ["example6_1", "example6_2"],
     },
     {
         "apartments": [
@@ -77,7 +86,7 @@ test_cases = [
         ],
         "vacant_filter": False,
         "expected_len": 2,
-        "expected_addresses": ["example7_1", "example7_2"]
+        "expected_addresses": ["example7_1", "example7_2"],
     },
     {
         "apartments": [
@@ -86,7 +95,7 @@ test_cases = [
         ],
         "vacant_filter": True,
         "expected_len": 1,
-        "expected_addresses": ["example8_1"]
+        "expected_addresses": ["example8_1"],
     },
     {
         "apartments": [
@@ -95,7 +104,7 @@ test_cases = [
         ],
         "vacant_filter": False,
         "expected_len": 2,
-        "expected_addresses": ["example9_1", "example9_2"]
+        "expected_addresses": ["example9_1", "example9_2"],
     },
     {
         "apartments": [
@@ -104,18 +113,23 @@ test_cases = [
         ],
         "vacant_filter": True,
         "expected_len": 0,
-        "expected_addresses": []
+        "expected_addresses": [],
     },
 ]
-    
+
+
 @pytest.mark.parametrize("test_case", test_cases)
 def test_db_get_apartments(test_case, test_db):
     session = test_db()
     for apartment in test_case["apartments"]:
-        db_apartment = db_create_apartment({"address": apartment["address"]}, session)
+        db_apartment = db_create_obj(
+            {"address": apartment["address"]}, ModelApartments, session
+        )
         if not apartment["vacant"]:
-            renter_db = db_create_renter(
-                {"renter_firstname": "first", "renter_lastname": "last"}, session
+            renter_db = db_create_obj(
+                {"renter_firstname": "first", "renter_lastname": "last"},
+                ModelRenters,
+                session,
             )
             lease_in = {
                 "apartment_id": db_apartment.apartment_id,
@@ -124,9 +138,11 @@ def test_db_get_apartments(test_case, test_db):
                 "end_date": datetime(2024, 12, 1),
                 "price": 200.99,
             }
-            db_create_lease(lease_in, session)
+            db_create_obj(lease_in, ModelLeases, session)
 
-    result = db_get_apartments(page=1, items_per_page=10, vacant=test_case["vacant_filter"], db=session)
+    result = db_get_apartments(
+        page=1, items_per_page=10, vacant=test_case["vacant_filter"], db=session
+    )
     items = result.get("items")
     assert len(items) == test_case["expected_len"]
     addresses = [item.address for item in items]
