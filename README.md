@@ -1,0 +1,2 @@
+- to run the application and see the API docs: docker-compose up --build
+- run unittests: cd into project directory & run pytest
