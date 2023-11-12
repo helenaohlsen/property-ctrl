@@ -4,15 +4,29 @@ from fastapi import Depends, FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from app.deps import get_db
-from app.db.db import (db_create_obj, db_find_by_id, db_get_apartments,
-                       db_query, db_update_obj)
+from app.db.db import (
+    db_create_obj,
+    db_find_by_id,
+    db_get_apartments,
+    db_query,
+    db_update_obj,
+)
 from app.db.session import SessionLocal
 from app.models import Apartments as ModelApartments
 from app.models import Leases as ModelLeases
 from app.models import Renters as ModelRenters
-from app.schemas import (Apartment, ApartmentCreate, ApartmentPagination,
-                         Lease, LeaseCreate, LeasePagination, LeaseUpdate,
-                         Renter, RenterCreate, RenterPagination)
+from app.schemas import (
+    Apartment,
+    ApartmentCreate,
+    ApartmentPagination,
+    Lease,
+    LeaseCreate,
+    LeasePagination,
+    LeaseUpdate,
+    Renter,
+    RenterCreate,
+    RenterPagination,
+)
 
 app = FastAPI()
 

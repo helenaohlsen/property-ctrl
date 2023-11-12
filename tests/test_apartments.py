@@ -31,11 +31,11 @@ def override_get_db():
 app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
+
+
 def test_get_apartments():
     response = client.post("/apartments/", json={"address": "Foo Street 19"})
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["address"] == "Foo Street 19"
     assert data["apartment_id"] == 1
-
-
