@@ -1,6 +1,6 @@
 from datetime import date, datetime
-from typing import List, Optional
-from pydantic import BaseModel, Field, validator
+from typing import List
+from pydantic import BaseModel, Field
 from decimal import Decimal
 
 from app.db.config import MAX_APARTMENT_ADDRESS_LEN, MAX_RENTER_FIRSTNAME_LEN, MAX_RENTER_LASTNAME_LEN
