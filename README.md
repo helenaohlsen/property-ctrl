@@ -13,7 +13,13 @@ Once the app is up and running, the interactive API documentation can be found a
 ![plot](img/api_doc1.png)
 
 ## Running the Tests
-The unit tests can simply be run by switching into the project directory and running: `pytest`.
+For this, installing pytest is necessary:
+
+`pip install pytest`
+
+The unit tests can simply be run by switching into the project directory and running: 
+
+`pytest`
 
 ### Notes
 - Pagination is supported on endpoints that return lists of objects.
